@@ -28,24 +28,58 @@ abstract class Vendedor {
   fun otrasCertificaciones() = certificaciones.count { !it.esDeProducto }
 
   fun puntajeCertificaciones() = certificaciones.sumBy { c -> c.puntaje }
+
+  abstract fun esInfluyente(): Boolean
+
 }
+
+//--------------------------------------------------------------------------------------------------
 
 // En los parámetros, es obligatorio poner el tipo
 class VendedorFijo(val ciudadOrigen: Ciudad) : Vendedor() {
   override fun puedeTrabajarEn(ciudad: Ciudad): Boolean {
     return ciudad == ciudadOrigen
   }
+
+  override fun esInfluyente()= false
+
 }
+
+
+//---------------------------------------------------------------------------------------------
 
 // A este tipo de List no se le pueden agregar elementos una vez definida
 class Viajante(val provinciasHabilitadas: List<Provincia>) : Vendedor() {
   override fun puedeTrabajarEn(ciudad: Ciudad): Boolean {
     return provinciasHabilitadas.contains(ciudad.provincia)
   }
+
+  override fun esInfluyente()= provinciasHabilitadas.sumBy { p -> p.poblacion } >= 10000000
 }
 
+
+//---------------------------------------------------------------------------------------------
+
+
+
 class ComercioCorresponsal(val ciudades: List<Ciudad>) : Vendedor() {
+
+  //var provincias= mutableListOf<Provincia>()
+
+  /*init{
+    this.misProvincias()
+  }*/
+
+  /*fun misProvincias(){
+  this.ciudades.forEach { c -> if ( ! this.provincias.contains(c.provincia))
+    this.provincias.add(c.provincia)}
+}*/
+
   override fun puedeTrabajarEn(ciudad: Ciudad): Boolean {
     return ciudades.contains(ciudad)
   }
+
+  override fun esInfluyente()= ciudades.count() >= 5
+          || ciudades.map { c -> c.provincia }.toSet().count() >= 3
+
 }
